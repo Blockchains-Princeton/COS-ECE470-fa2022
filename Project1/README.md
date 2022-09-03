@@ -93,7 +93,7 @@ If you see "Code format wrong" on screen, your code may change the lines that sh
 If in _log.txt_ you cannot see correct log, your zip file may have incorrect directories for auto-grader to compile.
 
 ## Double check (windows)
-Similar to Unix double checking auto-grader, we provide `autograder_windows.bat`. First, you need to manually unzip your netid.zip file, and put the `ece598pv-sp2022-main` folder inside a folder named after your netid. Make sure that `Cargo.toml` and `src/` is in `your-netid/ece598pv-sp2022-main`. Then double click `autograder_windows.bat`, enter your netid as instructed, and the result will be shown in a cmd window.
+Similar to Unix double checking auto-grader, we provide `autograder_windows.bat`. First, you need to manually unzip your netid.zip file, and put the `COS-ECE470-fa2022-main` folder inside a folder named after your netid. Make sure that `Cargo.toml` and `src/` is in `your-netid/COS-ECE470-fa2022-main`. Then double click `autograder_windows.bat`, enter your netid as instructed, and the result will be shown in a cmd window.
 
 You need to install `python3` to run it.
 ## Submission

@@ -101,8 +101,8 @@ Let they run for 5 minutes. Then we will use API to check the longest chain tran
 ## Double check
 We do not provide any script for this assignment. You can double check by following these procedures (which will be our grading procedures):
 
-1. unzip your zip file by this command: `unzip -qq netid.zip -d netid`, make sure your code is in this directory: `netid/ece598pv-sp2022-main`.
-2. run `cargo build`, which generates `netid/ece598pv-sp2022-main/target/debug/bitcoin`. It is the runnable binary of your code. (Windows may have `*.exe` and it's ok.)
+1. unzip your zip file by this command: `unzip -qq netid.zip -d netid`, make sure your code is in this directory: `netid/COS-ECE470-fa2022-main`.
+2. run `cargo build`, which generates `netid/COS-ECE470-fa2022-main/target/debug/bitcoin`. It is the runnable binary of your code. (Windows may have `*.exe` and it's ok.)
 3. run three processes of this binary and remember to give different ip/ports to them. For example, use these 3 commands:
 - `./bitcoin --p2p 127.0.0.1:6000 --api 127.0.0.1:7000`
 - `./bitcoin --p2p 127.0.0.1:6001 --api 127.0.0.1:7001 -c 127.0.0.1:6000`

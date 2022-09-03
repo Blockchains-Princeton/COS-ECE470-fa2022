@@ -4,8 +4,8 @@ for zipfile in *.zip; do
     unzip -qq $zipfile -d $netid
 	if [ -d $netid ]; then
 		echo "student netid: $netid" >> log.txt
-		python3 add_test.py $netid/ece598pv-sp2022-main
-		cd $netid/ece598pv-sp2022-main
+		python3 add_test.py $netid/COS-ECE470-fa2022-main
+		cd $netid/COS-ECE470-fa2022-main
 		cargo test sp2022autograder02 >> ../../log.txt 2>> build_log.txt
 		cd ../..
 	fi

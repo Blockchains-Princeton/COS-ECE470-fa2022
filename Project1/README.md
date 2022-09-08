@@ -30,11 +30,11 @@ You can learn about other public crates here: [https://docs.rs/](https://docs.rs
 For these crates, their github page or homepage may also be helpful. Feel free to read them.
 
 ## Repository management and submission:
-1. This repo provides the codebase for assignments. Please fork the current repo. **Change visibility to private.** Note: We are also going to use the same repo, which means you don't need to fork this repo again in the future.
+1. This repo provides the codebase for assignments. ~~Please fork the current repo. **Change visibility to private.** Note: We are also going to use the same repo, which means you don't need to fork this repo again in the future.~~ Please make a new **private** repo, e.g. hebbarashwin/COS-ECE470-fa2022 (Please do not change the name of the repo). Import this repository.
 2. You can run tests (by command `cargo test`) provided in the code to check the validity of their implementation. However, passing these tests doesn't guarantee getting full grades. 
 3. Push to your github repo's **main** branch (Hint: use `gitignore` file to avoid pushing unnecessary files!), and click `Code -> Download ZIP' on github to download a zip file. **Avoid zipping your code on your computer, since the directories or files on your computer may cause error for auto-grading.**
 4. Before submitting your code, you can double check by running the auto-grading script we provide to make sure we can auto-grade your code. (Details below.) 
-5. Rename it to your netid as `netid.zip`. Upload the zip file on compass2g. Please check your file size and it should not be very large.
+5. Rename it to your netid as `netid.zip`. Upload the zip file on canvas. Please check your file size and it should not be very large.
 6. TAs will put additional tests (private) to the auto-grader and run them to award marks.
 
 ## Code provided

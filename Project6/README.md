@@ -69,7 +69,7 @@ We do not provide any script for this assignment. You can double-check by follow
 - `./bitcoin --p2p 127.0.0.1:6000 --api 127.0.0.1:7000`
 - `./bitcoin --p2p 127.0.0.1:6001 --api 127.0.0.1:7001 -c 127.0.0.1:6000`
 - `./bitcoin --p2p 127.0.0.1:6002 --api 127.0.0.1:7002 -c 127.0.0.1:6001`
-4. start mining by mining API, and let it run for 5 minutes.
+4. start mining by mining API, and let it run for 5 minutes. For example: `http://127.0.0.1:7000/miner/start?lambda=1000000`
 5. use `/blockchain/longest-chain` API to get the longest chain in 3 nodes
 6. check whether the longest chains satisfy the aforementioned criteria.
 

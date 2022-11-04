@@ -12,16 +12,9 @@ No additional code will be provided for this assignment. **Notice: starting from
 
 ## Programming
 
-### Transaction network messages
-
-Add the following new messages and the procedures to process the message (which are similar to those of block-related messages):
-1. NewTransactionHashes(Vec<H256>), similar to NewBlockHashes
-2. GetTransactions(Vec<H256>), similar to GetBlocks
-3. Transactions(Vec<Transaciton>), similar to Blocks
-
 ### Transaction format
 
-You are free to choose any format for transaction structure. We recommend using a transaction structure that is either compatible with the UTXO model in Bitcoin or the account-based model in Ethereum. 
+You are free to choose any format for transaction structure (modify your implementation in *src/types/transaction.rs* ). We recommend using a transaction structure that is either compatible with the UTXO model in Bitcoin or the account-based model in Ethereum. 
 
 - UTXO model transaction: input contains the hash of the previous transaction and the index; output contains a recipient address and a value. It can support multiple inputs/outputs in a transaction. You can refer to [Bitcoin](https://en.bitcoin.it/wiki/Transaction) transaction but don't need to adopt its complex scripting language.
 - Account-based model transaction: it should contain a recipient address, a value, and an account nonce. It only supports a single sender and single receiver. This should be simpler to implement than the UTXO model.
@@ -30,12 +23,27 @@ Now it's time to add the transaction and its **Signature** to **SignedTransactio
 
 Remember to implement the trait **Hashable** for **SignedTransaction**; you should have already finished that since a previous assignment requires it.
 
+### Transaction Mempool
+
+Create a transaction **Mempool** structure to store all the received valid transactions which have not been included in the blockchain yet.
+If a new transaction passes the validity checks (explained below), add it to the mempool.
+**Mempool** will also be used by miner to include transactions in the blocks being mined. The miner will add transactions in the mempool to the block till it reaches the block size limit (upper limit). You can choose the size limit by yourself (remember to meet the requirements in the **Grading** section). There is no lower limit on transactions, i.e., a block may contain no transactions. Upon processing a new block (which is not an orphan or stale), remove the corresponding transactions from the mempool.
+
+Similar to **Blockchain**, you need the thread-safe wrapper `Arc<Mutex<>>` (The mempool will be used by the api, miner, and network worker).
+
+### Transaction network messages
+
+Add the following new messages and the procedures to process the message (which are similar to those of block-related messages):
+1. NewTransactionHashes(Vec<H256>), similar to NewBlockHashes
+2. GetTransactions(Vec<H256>), similar to GetBlocks
+3. Transactions(Vec<Transaciton>), similar to Blocks
+
 ### Checks
 Please add the following checks when receiving and processing a new transaction in *src/network/worker.rs*.
 
 #### Transaction signature check
 
-- Check if the transaction is signed correctly by the public key(s). 
+- Check if the transaction is signed correctly by the public key(s).
 
 - (Will not be tested or graded at this stage.) In the UTXO model, check that the public key(s) matches the owner(s)'s address of these inputs. In the account-based model, check if the public key matches the owner's address of the withdrawing account.
 
@@ -46,14 +54,6 @@ Please add the following checks when receiving and processing a new transaction 
 #### Add those checks when processing blocks
 
 When receiving and processing a block, also check transactions inside it.
-
-### Transaction Mempool
-
-Create a transaction **Mempool** structure to store all the received valid transactions which have not been included in the blockchain yet.
-If a new transaction passes the above checks, add it to the mempool.
-**Mempool** will also be used by miner to include transactions in the blocks being mined. The miner will add transactions in the mempool to the block till it reaches the block size limit (upper limit). You can choose the size limit by yourself (remember to meet the requirements in the **Grading** section). There is no lower limit on transactions, i.e., a block may contain no transactions. Upon processing a new block (which is not an orphan or stale), remove the corresponding transactions from the mempool.
-
-Similar to **Blockchain**, you need the thread-safe wrapper `Arc<Mutex<>>`.
 
 ### Transaction generator
 

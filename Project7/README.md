@@ -29,7 +29,7 @@ Create a transaction **Mempool** structure to store all the received valid trans
 If a new transaction passes the validity checks (explained below), add it to the mempool.
 **Mempool** will also be used by miner to include transactions in the blocks being mined. The miner will add transactions in the mempool to the block till it reaches the block size limit (upper limit). You can choose the size limit by yourself (remember to meet the requirements in the **Grading** section). There is no lower limit on transactions, i.e., a block may contain no transactions. Upon processing a new block (which is not an orphan or stale), remove the corresponding transactions from the mempool.
 
-Similar to **Blockchain**, you need the thread-safe wrapper `Arc<Mutex<>>` (The mempool will be used by the api, miner, and network worker).
+Similar to **Blockchain**, you need the thread-safe wrapper `Arc<Mutex<>>` (The mempool will be used by the miner and network worker).
 
 ### Transaction network messages
 
@@ -110,6 +110,16 @@ We do not provide any script for this assignment. You can double-check by follow
 4. start mining by mining API, tx-generator by its API (theta=100), and let it run for 5 minutes.
 5. use `/blockchain/longest-chain-tx` API to get the longest chain transactions in 3 nodes
 6. check whether they satisfy the aforementioned criteria.
+
+## FAQ
+
+- *If a transaction within a block is invalid, should we discard the entire block?* - Yes, this is because a honest miner would not mine a block with an invalid transaction.
+- *For this project, do we measure block size limit in bytes or in the number of transactions?* - Block size limit is measured in the number of transactions.
+- *How should the transaction generator be implemented?* - To implement the transaction generator you can create a new folder called `generator` and have a `mod.rs` and `worker.rs` similar to the `miner` folder. The only difference would be that this code would generate transactions instead of blocks.
+- *If the blockchains were in sync for the Part 6 but diverges in this part after the introduction of transaction generator, what might be the problem?* - You can put print statements within the new code you added to see if a node is getting stuck somewhere (maybe waiting for a blockchain.lock() to be released). Make sure you are using `drop(mempool)` or `drop(blockchain)` if you are using a locked mempool or blockchain in your network worker, miner or transaction generator. Also start with just two nodes with one of them mining, would help you better in debugging. Decreasing the mining rate would also help debugging. You can also make the transaction rate slower by setting the variable `interval` in `thread::sleep(interval)` to be `theta*x` where `x` can be adjusted manually.
+- *If we remove transactions from the mempool then how do we prevent duplicate transactions?* - Double spend checks will be done in Part 8.
+- 
+
 
 ## Advance notice
 1. In the next part, we need to add state validity to the transaction, which corresponds to the double spend checks.

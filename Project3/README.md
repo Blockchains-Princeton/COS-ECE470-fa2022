@@ -31,17 +31,17 @@ We suggest (but do not require) you create a struct **Content** to include the c
 
 Notice that to create the Merkle root of **SignedTransaction**, you must implement the trait **Hashable** for **SignedTransaction**. This trait should be implemented by serializing it into bytes, then calling SHA256 to hash the bytes.
 
-You need to implement the trait **Hashable** for **Block**. The way to hash a block is to hash **Header** rather than **Content**. So you can first implement **Hashable** for **Header**. When you hash a **Block**, you can directly call the hash function of **Header**.
+You need to implement the trait **Hashable** for **Block**. The way to hash a block is to hash **Header** rather than **Content**. So you can first implement **Hashable** for **Header**. When you hash a **Block**, you can directly call the hash function of **Header**. Please make sure you serialize the **Header** before hashing it.
 
 To test and debug, you must implement the function `generate_random_block()`. This function takes the hash of the parent block as an argument. The generated block should contain that *parent*. The *nonce* should be a random integer. You can let the content be empty. So merkle\_root should be the Merkle root of an empty input (make sure this is accounted for in your Merkle implementation). As for fields such as difficulty and timestamp, choose whatever you like.
 
 ### Blockchain
 
 You need to finish a struct named **Blockchain**, which contains the necessary information of a direct acyclic graph (DAG) and provides functions related to the longest chain rule. The following functions are required:
-1. new() - Create a new blockchain that only contains the information of the genesis block. (Define genesis block by yourself.)
+1. new() - Create a new blockchain that only contains the information of the genesis block. Define genesis block by yourself. 
 2. insert() - insert a block into the blockchain. You can (but not required) make it return struct `Result` to enable error handling when an invalid block is inserted. (We will not deal with invalid blocks in this part)
 3. tip() - Return the last block's hash in the longest chain. The tip should be computed in the new and insert functions; this should just return it.
-4. all_blocks_in_longest_chain() - return all blocks' hashes in a vector from the genesis to the tip. This function will not be tested in this part and will be used in the future.
+4. all_blocks_in_longest_chain() - return all blocks' hashes in a vector from the **genesis to the tip**. This function will not be tested in this part and will be used in the future.
 
 #### Storage choice
 
@@ -68,6 +68,11 @@ We will *NOT* call the insert function with invalid blocks. Specifically, we wil
 
 ## Double check
 We have provided an (incomplete) autograder. Same instructions as the previous parts.
+
+## FAQ
+- *Can the fields of Header/Content structs of the blockchain be made public?* - Yes, they can be made public. You can also define a `get` function instead.
+- *What values should the fields in the genesis block have?* - Note that the fields (for the genesis block) such as nonce, difficulty, timestamp, parent should be fixed and not random. You can set nonce and timestamp to `0` and difficulty to `0xff..ff` and parent to `0x00..00` (or any other fixed values for that matter).
+- *How does one set values to a variable of type H256?* - You can create a `[u8;32]` with fixed values and convert it to H256 using `.into()`. Alternatively, you can use the `hex_literal` crate and use `.into()`.
 
 ## Advance Notice
 1. If you want to learn about thread safety of the Blockchain struct, you can try `Arc<Mutex<Blockchain>>` in your code.

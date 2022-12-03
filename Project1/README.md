@@ -17,9 +17,9 @@ If you are already familiar with Rust, this simple assignment will take less tha
 In this course project, you will build a simplified Bitcoin client. The client's goal is not to run in the Bitcoin mainnet or any public testnet. Instead, the goal is to run it inside your team and let you have fun with it. You have plenty of freedom in designing and implementing this project.
 
 ## Reading 
-Please read [Rust by example](https://doc.rust-lang.org/rust-by-example/) to learn Rust grammar.
+Please refer to [Rust by example](https://doc.rust-lang.org/rust-by-example/) to learn Rust grammar.
 
-Please read [https://doc.rust-lang.org/cargo/](https://doc.rust-lang.org/cargo/) to learn Cargo, the Rust package manager, and building tool. After reading chapter 1, you'll be able to install Rust and Cargo and run a Rust project.
+Please refer to [https://doc.rust-lang.org/cargo/](https://doc.rust-lang.org/cargo/) to learn Cargo, the Rust package manager, and building tool. After reading chapter 1, you'll be able to install Rust and Cargo and run a Rust project.
 
 For [Rust standard crate](https://doc.rust-lang.org/stable/std/), we recommend you learn two very important structs: **String** and **Vec**.
 
@@ -60,7 +60,7 @@ These are the tasks of this assignment:
 
 - `fn from_public_key_bytes(bytes: &[u8])`
 
-- It uses SHA256 (from **ring** crate) to hash the input bytes, and takes the last 20 bytes, and converts them into a __Address__ struct. The code now contains `unimplemented!()`, and you can delete it and write your own code.
+- It uses SHA256 (from **ring** crate (version >= 0.16.20)) to hash the input bytes, and takes the last 20 bytes, and converts them into a __Address__ struct. The code now contains `unimplemented!()`, and you can delete it and write your own code.
 
 - We provide a small test function named **from_a_test_key()**. After you finish coding, you can run `cargo test from_a_test_key` and see this function's result in the output. It will look like the following.
 ```
@@ -71,7 +71,7 @@ test types::address::test::from_a_test_key ... ok
 2. The missing parts in file _src/types/transaction.rs_: 
 
 - Fill in the **Transaction** struct. We don’t expect the cryptocurrency and payment to be functional at this point, so you can put any content in transactions. A simple choice is to put **sender**, **receiver**, and **value** inside transactions. **sender**, **receiver** are of type **Address** and **value** is integer.
-- Fill in the `sign` and `verify` functions. These two functions should sign and verify the digital signature of the **Transaction** struct. Please use **ring** crate. You can use the [bincode](https://docs.rs/bincode/latest/bincode/) crate to serialize and deserialize any struct. The code we provide contains some `unimplemented!()` and you can delete it and write your own code.
+- Fill in the `sign` and `verify` functions. These two functions should sign and verify the digital signature of the **Transaction** struct. Please use **ring** (version >= 0.16.20) crate. You can use the [bincode](https://docs.rs/bincode/latest/bincode/) crate to serialize and deserialize any struct. The code we provide contains some `unimplemented!()` and you can delete it and write your own code.
 - A tricky part about transaction and signature is how you put them together. Hence, we provide another struct called **SignedTransaction**. You can let this struct have a transaction, a signature, and a public key that creates the signature. Notice that crate *ring*'s signature and public key structs may not be very convenient to use, so you can convert them to a vector of bytes: `let signature_vector: Vec<u8> = signature.as_ref().to_vec();`
 - For testing, you need to fill in the function **generate_random_transaction()**, which will generate a random transaction on each call. It should generate two different transactions on two calls. We require this since we frequently use this function in our tests and grading. Again, there is `unimplemented!()` and you can delete it.
 - We provide a small test function named **sign_verify()**. After you finish, you can run `cargo test sign_verify` / `sign_verify_two` and see this function's result in the output. It will look like the following.
@@ -89,7 +89,7 @@ You can open the output file _log.txt_and see whether your code passes the auto-
 
 If you see "Code format wrong" on the screen, it may be due to changing these lines in the code: `// DO NOT CHANGE THIS COMMENT, IT IS FOR AUTOGRADER.`
 
-If in _log.txt_ you cannot see the correct log; your zip file may have incorrect directories for the auto-grader to compile.
+If in _log.txt_ you cannot see the correct log; your zip file may have incorrect directories for the auto-grader to compile. Any compilation errors would be in _build_log.txt_ file that gets created in the folder.
 
 ## Double check (windows)
 Similar to the Unix double-checking auto-grader, we have provided `autograder_windows.bat`. First, you need to unzip your netid.zip file manually and put the `COS-ECE470-fa2022-main` folder inside a folder named after your netid. Put the folder `your-netid` in the a new folder containing [autograder.sh](autograder.sh) and [add_test.py](add_test.py). Make sure that `Cargo.toml` and `src/` is in `your-netid/COS-ECE470-fa2022-main`. Then double click `autograder_windows.bat`, enter your netid as instructed, and the result will be shown in a cmd window.
@@ -97,6 +97,7 @@ Similar to the Unix double-checking auto-grader, we have provided `autograder_wi
 You need to install `python3` to run it.
 ## Submission
 Download the zip file of your repo on GitHub. Rename it to your netid as `netid.zip`. Upload the zip file on canvas. Please ensure that the file size is <2MB.
+
 
 ## Advance Notice
 - At the end of the course, you will implement a functional cryptocurrency client based on this codebase. So it is helpful to get familiar with this codebase.

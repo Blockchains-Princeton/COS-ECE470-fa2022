@@ -27,7 +27,7 @@ Add code to check the PoW validity of a block by checking if:
 
 #### Orphan block handler
 
-Check if the new processed block is a parent to any block in the orphan buffer; if that is the case, remove the block from the orphan buffer and process the block. This step should be done iteratively. I.e., a block enables the processing of a former orphan, and the latter allows another former orphan block to be processed, and so on.
+Check if the new processed block is a parent to any block in the orphan buffer; if that is the case, remove the block from the orphan buffer and process the block. This step should be done iteratively: insertion of a block A enables the processing of a former orphan B, insertion of B may allow another former orphan block C to be processed, and so on.
 
 ### Make sure modules of previous assignments work together
 
@@ -52,7 +52,7 @@ Please ensure this API works and outputs the correct JSON format since it is cru
 
 Now that we have a working blockchain program, we will auto-grade the program by running 3 nodes (processes) of it locally. Let's call them nodes A, B, and C. We will start nodes A, B, and C. We will connect node A to node B and node B to node C. Notice that nodes A and C are not connected.
 
-For mining, we will start 3 nodes' miner with `lambda=0`. You should choose a proper block difficulty in your code. A suggestion is to have a _smaller_ difficulty so that the mining rate of blocks can be lower to reduce forking. (Below, we require >=10 blocks/minute, and you can have a larger value, e.g., 20 blocks/minute, to have higher confidence to meet our requirement.)
+For mining, we will start 3 nodes' miner with `lambda=0`. **You should choose a proper block difficulty in your code.** A suggestion is to have a _smaller_ difficulty so that the mining rate of blocks can be lower to reduce forking. (Below, we require >=10 blocks/minute, and you can have a larger value, e.g., 20 blocks/minute, to have higher confidence to meet our requirement.)
 
 Let them run for 5 minutes. Then we will use the API to check the longest chains in them. The grading is related to the comparison between the three nodes.
 
@@ -63,15 +63,39 @@ Let them run for 5 minutes. Then we will use the API to check the longest chains
 ## Double check
 We do not provide any script for this assignment. You can double-check by following these procedures (which will be our grading procedures):
 
-1. unzip your zip file by this command: `unzip -qq netid.zip -d netid`, make sure your code is in this directory: `netid/COS-ECE470-fa2022-main`.
-2. run `cargo build`, which generates `netid/COS-ECE470-fa2022-main/target/debug/bitcoin`. It is the runnable binary of your code. (Windows may have `*.exe`, and it's ok.)
-3. run three processes of this binary and remember to give different IP/ports to them. For example, use these 3 commands:
+1. Unzip your zip file by this command: `unzip -qq netid.zip -d netid`, make sure your code is in this directory: `netid/COS-ECE470-fa2022-main`.
+2. Run `cargo build`, which generates `netid/COS-ECE470-fa2022-main/target/debug/bitcoin`. It is the runnable binary of your code. (Windows may have `*.exe`, and it's ok.)
+3. Run three processes of this binary and remember to give different IP/ports to them. For example, use these 3 commands:
 - `./bitcoin --p2p 127.0.0.1:6000 --api 127.0.0.1:7000`
 - `./bitcoin --p2p 127.0.0.1:6001 --api 127.0.0.1:7001 -c 127.0.0.1:6000`
 - `./bitcoin --p2p 127.0.0.1:6002 --api 127.0.0.1:7002 -c 127.0.0.1:6001`
-4. start mining by mining API, and let it run for 5 minutes. For example: `http://127.0.0.1:7000/miner/start?lambda=1000000`
-5. use `/blockchain/longest-chain` API to get the longest chain in 3 nodes
-6. check whether the longest chains satisfy the aforementioned criteria.
+4. Start mining by mining API, and let it run for 5 minutes. For example: (During grading we will use `lambda=0`)
+- http://127.0.0.1:7000/miner/start?lambda=1000000
+- http://127.0.0.1:7001/miner/start?lambda=1000000
+- http://127.0.0.1:7002/miner/start?lambda=1000000
+
+5. Use the `/blockchain/longest-chain` API to get the longest chain in 3 nodes
+- http://127.0.0.1:7000/blockchain/longest-chain
+- http://127.0.0.1:7001/blockchain/longest-chain
+- http://127.0.0.1:7002/blockchain/longest-chain
+6. Check whether the longest chains satisfy the aforementioned criteria.
+
+
+## FAQ
+- *How should difficulty be set?* 
+     - During grading, the miner will be run with `lambda=0`. You should set a difficulty in the genesis block such that 10-20 blocks are mined per minute. Setting the difficulty to be too easy may result in excessive forking and the longest chains of the nodes not being in sync.
+     - You can use the `hex_literal` crate to set the difficulty (Eg: `let difficulty = hex!("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff").into()`)
+- *Once started, how can one pause the miner?* 
+     - You can use a very high value of `lambda` to pause mining, Eg: http://127.0.0.1:7000/miner/start?lambda=100000000000
+- *The longest chains are not in sync, what might be the problem?*
+    - You can put print statements at different points of your code (miner, network messages) to check if a node is getting stuck somewhere (maybe waiting for a `blockchain.lock()` to be released - check this by adding a print statement before and after locking statements). Make sure you are using `drop(blockchain)` if you are using a locked blockchain in your network worker or miner.  
+     - The genesis block may have some randomness. It should be fully deterministic; this ensures all nodes start with the same genesis block.
+     - The network may be jammed due to too many messages, causing a delay: You may be sending a lot of empty `NewBlockHashes` messages. The difficulty may be set too easy resulting in too many blocks being mined.
+     - It may be easier to debug by starting with just two nodes with one of them mining. Decreasing the mining rate (by setting a larger lambda, or using a low value for `difficulty`) would also help debugging.
+- *How should one structure the code for handling orphan blocks?* 
+    - A simple way to do this is to initialize a orphan buffer HashMap before the `loop` starts in the worker. Instead of having a map from `hash` to `block`, it might be better to have a map from `parent hash` to `block`. In the `match` statement for `Message::Blocks`, check if the new processed block is a parent to any block in the orphan buffer. If that is the case, remove the block from the orphan buffer and process the block. This step should be done iteratively. I.e., once an orphan block is inserted, check if the orphan buffer has any of its children, and so on.
+- *Is it okay if one fails the test cases of previous parts? (e.g. `reply_blocks_test`)* 
+     - Yes, it is fine if you fail test cases of previous parts.
 
 ## Advance notice
 1. In the next part, you will make the data meaningful, i.e., expressive for cryptocurrency operations.

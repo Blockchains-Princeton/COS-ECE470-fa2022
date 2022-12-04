@@ -31,7 +31,7 @@ For these crates, their GitHub page or homepage may also be helpful. Feel free t
 ## Repository management and submission:
 1. This repo provides the codebase for assignments. Please make a new **private** repo, e.g. hebbarashwin/COS-ECE470-fa2022 (Please do not change the name of the repo). Import code from https://github.com/Blockchains-Princeton/COS-ECE470-fa2022.git.
 2. You can run tests (by command `cargo test`) provided in the code to check the validity of their implementation. However, passing these tests doesn't guarantee to get full grades. 
-3. Push to your GitHub repo's **main** branch (Hint: use `gitignore` file to avoid pushing unnecessary files! Specifically, the `target` directory should not be pushed), and click `Code -> Download ZIP' on GitHub to download a zip file. **Avoid zipping your code on your computer since the directories or files on your computer may cause an error for auto-grading.**
+3. Push to your GitHub repo's **main** branch (Please use `gitignore` file to avoid pushing unnecessary files! Specifically, the `target` directory should not be pushed), and click `Code -> Download ZIP' on GitHub to download a zip file. **Avoid zipping your code on your computer since the directories or files on your computer may cause an error for auto-grading.**
 4. Before submitting your code, you can double-check by running the auto-grading script we provide to make sure we can auto-grade your code. (Details below.) 
 5. Rename it to your netid as `netid.zip`. Upload the zip file on canvas. Please ensure that the file size <2MB.
 6. TAs will put additional tests (private) to the auto-grader and run them to award marks.

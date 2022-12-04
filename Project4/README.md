@@ -1,6 +1,6 @@
 # Bitcoin Client Project, Part 4
 
-In this part of the project, you will implement the **miner** module of the Bitcoin client. The miner module, or miner, will produce blocks that solve the proof-of-work puzzle.
+In this part of the project, you will implement the **miner** module of the Bitcoin client. The miner will produce blocks that solve the proof-of-work puzzle.
 
 ## Repository management and submission
 
@@ -24,7 +24,7 @@ http://127.0.0.1:7000/miner/start?lambda=1000000
 Then you will see this log in the terminal
 > Miner starting in continuous mode with lambda 1000000
 
-This means the miner is started and keeps working in the *main mining loop*. We also provide a parameter *lambda* and use it in sleep function inside the main mining loop, since we don't want excessive CPU usage. Here lambda is 1000000 (microseconds), so in each iteration of the main mining loop, it will sleep for that long.
+This means the miner is started and keeps working in the *main mining loop*. We also provide a parameter *lambda* and use it in the sleep function inside the main mining loop, to avoid excessive CPU usage. In the above example, lambda is 1000000 (microseconds), the miner will sleep for this duration after every iteration of the main mining loop.
 
 `-vv` in `cargo run -- -vv` means the level of logging is 2 (info). With `-vvv` the level is 3 (debug), and you can get more logs in the terminal.
 
@@ -50,28 +50,28 @@ Hence, in this part, you need to add blockchain into miner **Context** and **Wor
 2. Add `Arc<Mutex<Blockchain>>` to the definition of miner **Context** and **Worker** struct.
 3. Add `blockchain: &Arc<Mutex<Blockchain>>` to the argument of *new()* functions. Inside *new()* functions, use `Arc::clone(blockchain)` to get a clone and pass it to the structs.
 
-At last, you need to go to *src/main.rs*, and change the code related to *new()* functions. You need to first create a new **Blockchain**, then turn it into `Arc<Mutex<Blockchain>>`, then pass it into *new()* functions.
+Finally, you need to go to *src/main.rs*, and change the code related to *new()* functions. You need to first create a new **Blockchain** (already implemented), turn it into `Arc<Mutex<Blockchain>>`, and pass this into *new()* functions.
 
 
 ### Main mining loop
 
-The main mining loop is the loop that tries random nonces to solve the proof-of-work puzzle. We have provided the loop with some code. The actual mining may start from "TODO for student: actual mining" comment.
+The main mining loop tries random nonces to solve the proof-of-work puzzle. We have provided the loop with some starter code. The actual mining logic may start from the "TODO for student: actual mining" comment.
 
 To build a block, you need to gather a block's fields. In a block header, the fields are gathered as follows,
-1. parent - use *blockchain.tip()*. You can have a variable to store it and only call *blockchain.tip()* when *ControlSignal::Update* is received.
-2. timestamp - use `std::time`, you can refer [this document](https://doc.rust-lang.org/std/time/constant.UNIX_EPOCH.html). We suggest using millisecond as the unit rather than second, since second may be too coarse when we measure block delay in the future.
-3. difficulty - it should be computed from parent and ancestor blocks with some adaptive rule. In this project, we use the simple rule: a static/constant difficulty: The difficulty of this block should be the same as that of the parent block.
+1. parent - use *blockchain.tip()*. You can have a variable to store it and update it whenever you mine a new block. You could also update the tip when *ControlSignal::Update* is received (we have not implemented this control signal).
+2. timestamp - use `std::time`, you can refer to [this document](https://doc.rust-lang.org/std/time/constant.UNIX_EPOCH.html). We suggest using millisecond as the unit rather than second, since second may be too coarse when we measure block delay in the future.
+3. difficulty - it should be computed from parent and ancestor blocks with some adaptive rule. In this project, we use the simple rule: a static/constant difficulty: The difficulty of this block should be the same as that of the parent block. (Hence the difficulty will be set in the genesis block)
 4. Merkle root - compute it by creating a Merkle tree from the content, i.e., signed transactions.
 5. nonce - generate a random nonce (use *rand* crate) in every iteration, or increment nonce (say, increment by 1) in every iteration. PS do you think there is any difference in the probability of solving the puzzle?
 
 As for the block content, you can put arbitrary content since we don't have a memory pool yet in this step. You can place an empty vector or some random transactions.
 
-After you have all these fields and build a block, just check whether the proof-of-work hash puzzle is satisfied by
+After you have used these fields to build a block, just check whether the proof-of-work hash puzzle is satisfied by
 ```
 block.hash() <= difficulty
 ```
 
-If it is satisfied, the block is successfully generated. Congratulations! Just send the block to the channel *finished_block_chan*. And keep on mining for another block. Do not forget to update the parent of the block being mined!
+If it is satisfied, the block is successfully generated. Congratulations! Just send the block to the channel *finished_block_chan*. And keep on mining for another block. Do not forget to update the parent of the block being mined to the tip of the blockchain!
 
 ### Miner worker
 To avoid writing an enormous struct and to make auto-grading feasible, we split the miner into two smaller modules, **Context** and **Worker**, and the latter has the following functionality.
@@ -91,6 +91,20 @@ We will auto-grade the program by testing whether the miner can mine 10 blocks w
 
 ## Double check
 We have provided an (incomplete) autograder. Same instructions as the previous parts.
+Please ensure that `test_new()` does not admit any arguments. This function will be called by the autograder.
+
+## FAQ
+
+- *My mined block is not being inserted by the worker* 
+    - This may be a locking issue. When you call `blockchain = self.blockchain.lock().unwrap()`, the mutex lock will be held by this thread until it goes out of scope, or it is explicitly dropped. You may be facing a scenario where the worker thread is waiting for the miner loop thread to release the mutex lock before it can insert the block.
+    Please use scopes to ensure that the lock is dropped (Eg: `let tip = {self.blockchain.lock().unwrap().tip()};` instead of `let tip = self.blockchain.lock().unwrap().tip();`). 
+    The lock can also be dropped using `drop()`. Eg: 
+    ```let bc = self.blockchain.lock().unwrap(); let tip = bc.tip(); drop(bc);```)
+- *Should I create a new, empty blockchain in the `test_new()` function?* 
+     - Yes.
+- *I pass the `miner_three_block` test case, but I face an error: `a thread 'miner' panicked at 'Send finished block error: "SendError(..)"`* 
+     - This error comes up because the receiving end of finished_block_chan gets disconnected after the test function exits, but the miner is still running in another thread and sending blocks on the same channel. This is fine.
+
 
 ## Advance notice
 1. Miner also needs a memory pool. We will cover them in the future.

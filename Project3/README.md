@@ -70,9 +70,12 @@ We will *NOT* call the insert function with invalid blocks. Specifically, we wil
 We have provided an (incomplete) autograder. Same instructions as the previous parts.
 
 ## FAQ
-- *Can the fields of Header/Content structs of the blockchain be made public?* - Yes, they can be made public. You can also define a `get` function instead.
-- *What values should the fields in the genesis block have?* - Note that the fields (for the genesis block) such as nonce, difficulty, timestamp, parent should be fixed and not random. You can set nonce and timestamp to `0` and difficulty to `0xff..ff` and parent to `0x00..00` (or any other fixed values for that matter).
-- *How does one set values to a variable of type H256?* - You can create a `[u8;32]` with fixed values and convert it to H256 using `.into()`. Alternatively, you can use the `hex_literal` crate and use `.into()`.
+- *Can the fields of Header/Content structs of the blockchain be made public?* 
+    - Yes, they can be made public. You can also define a `get` function instead.
+- *What values should the fields in the genesis block have?* 
+    - Note that the fields (for the genesis block) such as nonce, difficulty, timestamp, parent should be fixed and not random. You can set nonce and timestamp to `0` and difficulty to `0xff..ff` and parent to `0x00..00` (or any other fixed values for that matter).
+- *How does one set values to a variable of type H256?* 
+    - You can create a `[u8;32]` with fixed values and convert it to H256 using `.into()`. Alternatively, you can use the `hex_literal` crate and use `.into()`.
 
 ## Advance Notice
 1. If you want to learn about thread safety of the Blockchain struct, you can try `Arc<Mutex<Blockchain>>` in your code.

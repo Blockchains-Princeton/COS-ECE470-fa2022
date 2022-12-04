@@ -18,6 +18,7 @@ You are free to choose any format for transaction structure (modify your impleme
 
 - UTXO model transaction: input contains the hash of the previous transaction and the index; output contains a recipient address and a value. It can support multiple inputs/outputs in a transaction. You can refer to [Bitcoin](https://en.bitcoin.it/wiki/Transaction) transaction but don't need to adopt its complex scripting language.
 - Account-based model transaction: it should contain a recipient address, a value, and an account nonce. It only supports a single sender and single receiver. This should be simpler to implement than the UTXO model.
+The account nonce is a transaction counter in each account.
 
 Now it's time to add the transaction and its **Signature** to **SignedTransaction**. As introduced in previous assignment, crate *ring*'s signature may not be very convenient to use, so you can convert them to vector of bytes: `let signature_vector: Vec<u8> = signature.as_ref().to_vec();`.  You must also add the signer's public key to **SignedTransaction**.
 
@@ -101,23 +102,38 @@ Let them run for 5 minutes. Then we will use API to check the longest chain tran
 ## Double check
 We do not provide any script for this assignment. You can double-check by following these procedures (which will be our grading procedures):
 
-1. unzip your zip file by this command: `unzip -qq netid.zip -d netid`; make sure your code is in this directory: `netid/COS-ECE470-fa2022-main`.
-2. run `cargo build`, which generates `netid/COS-ECE470-fa2022-main/target/debug/bitcoin`. It is the runnable binary of your code. (Windows may have `*.exe`, and it's okay.)
-3. run three processes of this binary and remember to give different IP/ports to them. For example, use these 3 commands:
+1. Unzip your zip file by this command: `unzip -qq netid.zip -d netid`; make sure your code is in this directory: `netid/COS-ECE470-fa2022-main`.
+2. Run `cargo build`, which generates `netid/COS-ECE470-fa2022-main/target/debug/bitcoin`. It is the runnable binary of your code. (Windows may have `*.exe`, and it's okay.)
+3. Run three processes of this binary and remember to give different IP/ports to them. For example, use these 3 commands:
 - `./bitcoin --p2p 127.0.0.1:6000 --api 127.0.0.1:7000`
 - `./bitcoin --p2p 127.0.0.1:6001 --api 127.0.0.1:7001 -c 127.0.0.1:6000`
 - `./bitcoin --p2p 127.0.0.1:6002 --api 127.0.0.1:7002 -c 127.0.0.1:6001`
-4. start mining by mining API, tx-generator by its API (theta=100), and let it run for 5 minutes.
-5. use `/blockchain/longest-chain-tx` API to get the longest chain transactions in 3 nodes
-6. check whether they satisfy the aforementioned criteria.
+4. Start mining using the mining API, tx-generator using its API (`theta=100`), and let it run for 5 minutes :
+- http://127.0.0.1:7000/tx-generator/start?theta=100
+- http://127.0.0.1:7000/miner/start?lambda=0
+- http://127.0.0.1:7001/tx-generator/start?theta=100
+- http://127.0.0.1:7001/miner/start?lambda=0
+- http://127.0.0.1:7002/tx-generator/start?theta=100
+- http://127.0.0.1:7002/miner/start?lambda=0
+
+5. Use the `/blockchain/longest-chain-tx` API to get the longest chain transactions in 3 nodes :
+- http://127.0.0.1:7000/blockchain/longest-chain-tx
+- http://127.0.0.1:7001/blockchain/longest-chain-tx
+- http://127.0.0.1:7002/blockchain/longest-chain-tx
+6. Check whether they satisfy the aforementioned criteria.
 
 ## FAQ
 
-- *If a transaction within a block is invalid, should we discard the entire block?* - Yes, this is because a honest miner would not mine a block with an invalid transaction.
-- *For this project, do we measure block size limit in bytes or in the number of transactions?* - Block size limit is measured in the number of transactions.
-- *How should the transaction generator be implemented?* - To implement the transaction generator you can create a new folder called `generator` and have a `mod.rs` and `worker.rs` similar to the `miner` folder. The only difference would be that this code would generate transactions instead of blocks. In `main.rs`, this generator would share the same `server` as the miner and network worker.
-- *If the blockchains were in sync for the Part 6 but diverges in this part after the introduction of transaction generator, what might be the problem?* - You can put print statements within the new code you added to see if a node is getting stuck somewhere (maybe waiting for a blockchain.lock() to be released). Make sure you are using `drop(mempool)` or `drop(blockchain)` if you are using a locked mempool or blockchain in your network worker, miner or transaction generator. Also start with just two nodes with one of them mining, would help you better in debugging. Decreasing the mining rate would also help debugging. You can also make the transaction rate slower by setting the variable `interval` in `thread::sleep(interval)` to be `theta*x` where `x` can be adjusted manually. Also, if many blocks in your longest chan are empty, then you can put a condition in the miner to mine a block only when at least one transction has been included in the block.
-- *If we remove transactions from the mempool then how do we prevent duplicate transactions?* - Double spend checks will be done in Part 8.
+- *If a transaction within a block is invalid, should we discard the entire block?* 
+     - Yes, this is because a honest miner would not mine a block with an invalid transaction.
+- *For this project, do we measure block size limit in bytes or in the number of transactions?* 
+     - Block size limit is measured in the number of transactions.
+- *How should the transaction generator be implemented?* 
+     - To implement the transaction generator you can create a new folder called `generator` and have a `mod.rs` and `worker.rs` similar to the `miner` folder. The only difference would be that this code would generate transactions instead of blocks. In `main.rs`, this generator would share the same `server` as the miner and network worker.
+- *If the blockchains were in sync for the Part 6 but diverges in this part after the introduction of transaction generator, what might be the problem?* 
+    - You can put print statements within the new code you added to see if a node is getting stuck somewhere (maybe waiting for a blockchain.lock() to be released). Make sure you are using `drop(mempool)` or `drop(blockchain)` if you are using a locked mempool or blockchain in your network worker, miner or transaction generator. Also start with just two nodes with one of them mining, would help you better in debugging. Decreasing the mining rate would also help debugging. You can also make the transaction rate slower by setting the variable `interval` in `thread::sleep(interval)` to be `theta*x` where `x` can be adjusted manually. Also, if many blocks in your longest chain are empty, then you can put a condition in the miner to mine a block only when at least one transction has been included in the block.
+- *If we remove transactions from the mempool then how do we prevent duplicate transactions?* 
+    - Double spend checks will be done in Part 8.
 
 
 ## Advance notice

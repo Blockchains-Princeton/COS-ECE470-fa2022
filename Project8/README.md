@@ -31,7 +31,7 @@ Ledger state, or **State**, is a collection of all the required information to c
 - In the UTXO model, **State** should contain all the unspent transaction outputs. The format of an unspent transaction output may contain *(transaction hash, output index, value, recipient)*. Output index refers to the index in transactions (remember transactions are multi-output.) Recipient refers to the recipient address of that output and is used as the owner of that unspent transaction output.
 - In the account-based model, **State** should contain all the accounts' information. It may have *(account address, account nonce, balance)*.
 
-To access data conveniently, we recommend using HashMap to store State. In the UTXO model, we recommend `HashMap<(transaction hash, output index), (value, recipient)>`. In the account-based model, we recommend `HashMap<account address, (account nonce, balance)>`.
+To access data conveniently, **we recommend using a HashMap to store State**. In the UTXO model, we recommend `HashMap<(transaction hash, output index), (value, recipient)>`. In the account-based model, we recommend `HashMap<account address, (account nonce, balance)>`.
 
 #### State update
 When executing a block, i.e., executing transactions in that block, we need to update the state.
@@ -64,15 +64,15 @@ It should output a representation of the state at a certain block in the longest
 
 > ["UTXO1","UTXO2","UTXO3"]
 
-("UTXO1" is a placeholder for your entry representation.) And make sure to include "transaction hash, output index, value, recipient" 4-tuple in the unspent transaction output entry representation.
+("UTXO1" is a placeholder for your entry representation.) And make sure to include "transaction hash, output index, value, recipient" 4-tuple in the unspent transaction output entry representation. This 4-tuple should be converted to a **single string**.
 
 - Account-based model: all the account's information should be in an array, like the following example that has three entries:
 
 > ["Account1","Account2","Account3"]
 
-("Account1" is a placeholder for your entry representation.) And make sure to include "address, account nonce, balance" 3-tuple in the account information representation.
+("Account1" is a placeholder for your entry representation.) And make sure to include "address, account nonce, balance" 3-tuple in the account information representation. This 3-tuple should be converted to a **single string**.
 
-On how to parse the parameter `?block=10` you can refer to the code of parsing `lambda` for miner API. Please write this API and outputs the correct JSON format, since it is crucial for auto-grading. You can run your program by `cargo run` or directly run the binary in `target`. Then you can call `http://127.0.0.1:7000/blockchain/state?block=10` or another number in your browser or use a command like `curl` to check if it works.
+On how to parse the parameter `?block=10` you can refer to the code of parsing `lambda` for miner API. Please write this API and outputs the correct JSON format, since it is crucial for auto-grading. You can run your program by `cargo run` or directly run the binary in `target`. Then you can call http://127.0.0.1:7000/blockchain/state?block=10 or another number in your browser or use a command like `curl` to check if it works.
 
 
 ## Conclusion
@@ -99,15 +99,31 @@ Let them run for 5 minutes. Then we will use API to check the states in them. We
 ## Double check
 We do not provide any script for this assignment. You can double-check by following these procedures (which will be our grading procedures):
 
-1. unzip your zip file by this command: `unzip -qq netid.zip -d netid`, make sure your code is in this directory: `netid/ece598pv-sp2022-main`.
-2. run `cargo build`, which generates `netid/ece598pv-sp2022-main/target/debug/bitcoin`. It is the runnable binary of your code. (Windows may have `*.exe`, and it's ok.)
-3. run three processes of this binary and remember to give different ip/ports to them. For example, use these 3 commands:
+1. Unzip your zip file by this command: `unzip -qq netid.zip -d netid`, make sure your code is in this directory: `netid/COS-ECE470-fa2022-main`.
+2. Run `cargo build`, which generates `netid/COS-ECE470-fa2022-main/target/debug/bitcoin`. It is the runnable binary of your code. (Windows may have `*.exe`, and it's ok.)
+3. Run three processes of this binary and remember to give different ip/ports to them. For example, use these 3 commands:
 - `./bitcoin --p2p 127.0.0.1:6000 --api 127.0.0.1:7000`
 - `./bitcoin --p2p 127.0.0.1:6001 --api 127.0.0.1:7001 -c 127.0.0.1:6000`
 - `./bitcoin --p2p 127.0.0.1:6002 --api 127.0.0.1:7002 -c 127.0.0.1:6001`
-4. start mining by mining API, tx-generator by its API (theta=100), and let it run for 5 minutes.
-5. use `/blockchain/state` API to get the states in 3 nodes
-6. check whether they satisfy the aforementioned criteria.
+4. Start mining by mining API, tx-generator by its API (theta=100), and let it run for 5 minutes.
+5. Use `/blockchain/state` API to get the states in 3 nodes
+6. Check whether they satisfy the aforementioned criteria.
+
+## FAQ
+
+- *How can one set up initial addresses for each node?* 
+     - TODO
+- *How can one pass the keypairs of addresses defined in the genesis to the transaction generators?* 
+     - TODO
+- *What do you mean by State of a block?* 
+     - TODO
+- *If the blockchains were in sync for the Part 7 but diverges in this part after the introduction of State, what might be the problem?* 
+    - TODO
+- *How can one increase the number of valid transactions in a block?* 
+    - TODO
+- *Do I need to satisfy the grading requirements of Part7?*
+    - No.
+
 
 #### Note
 We do not ask you to implement transaction fees, mining rewards, and the corresponding coinbase transaction for this project.

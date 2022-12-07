@@ -1,5 +1,5 @@
 use serde::{Serialize,Deserialize};
-use ring::signature::{Ed25519KeyPair, Signature, KeyPair, VerificationAlgorithm, EdDSAParameters};
+use ring::signature::{Ed25519KeyPair, Signature};
 use rand::Rng;
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone)]

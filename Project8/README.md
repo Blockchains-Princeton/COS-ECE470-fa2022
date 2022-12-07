@@ -24,6 +24,7 @@ In the last part, you included transactions into blocks. To prevent misbehavior 
 - In the UTXO model, check if the inputs to the transactions are not spent, i.e. exist in **State** (see below). Also, check that the values of inputs are not less than those of outputs.
 - In the account-based model, check if the balance is enough and if the suggested account nonce equals one plus the account nonce. This check also needs **State** (see below).
 
+You should also consider cases where each individual transaction may be valid; but cannot be valid together in the same block.
 ### State
 
 Ledger state, or **State**, is a collection of all the required information to check transactions.  
@@ -36,7 +37,7 @@ To access data conveniently, **we recommend using a HashMap to store State**. In
 #### State update
 When executing a block, i.e., executing transactions in that block, we need to update the state.
 - In the UTXO model, remove those *inputs*, and add *outputs* to the state.
-- In the account-based model, change the account's nonce and balance. Create new accounts if required.
+- In the account-based model, change the accounts' nonce and balance. Create new accounts if required.
 
 #### Initial state (ICO)
 You can do an initial coin offering (ICO) by inserting an entry into **State** struct. **The grading section requires the ICO to insert exactly one entry.**
@@ -62,17 +63,20 @@ It should output a representation of the state at a certain block in the longest
 
 - UTXO model: all the unspent transaction output entries should be in an array, like the following example that has three entries:
 
-> ["UTXO1","UTXO2","UTXO3"]
+<!-- > ["UTXO1","UTXO2","UTXO3"] -->
+`["(ef307355202461e57e08b40c0c024440b468518ef9b4a8770b288a75a94e3f8b, 2, 5, 71fa98fadbe1da07384165aa31eb069044060209)","(ef307355202461e57e08b40c0c024440b468518ef9b4a8770b288a75a94e3f8b, 1, 234, 896e9556ea1dc78ca55c236d6f6a5f81bff13dfd)","(9f1c534efb06233235a89a35f264aaf83ed2b991c7b79e114600c39021622bad, 0, 8645, 71fa98fadbe1da07384165aa31eb069044060209)",]`
+<!-- ("UTXO1" is a placeholder for your entry representation.) And make sure to include "transaction hash, output index, value, recipient" 4-tuple in the unspent transaction output entry representation. This 4-tuple should be converted to a **single string**. -->
 
-("UTXO1" is a placeholder for your entry representation.) And make sure to include "transaction hash, output index, value, recipient" 4-tuple in the unspent transaction output entry representation. This 4-tuple should be converted to a **single string**.
+Each UTXO representation should include "transaction hash, output index, value, recipient" 4-tuple.
 
-- Account-based model: all the account's information should be in an array, like the following example that has three entries:
+- Account-based model: all accounts' information should be in an array, like the following example that has three entries:
 
-> ["Account1","Account2","Account3"]
+> `["(d5025bb3b5085be913b0778c82f5c73aa831ed2c, 1, 985035)","(a0d741628fc826e09475d341a780acde3c4b8070, 2, 14965)", "(4r5tghb6b608hbttyb50778c8255cr56a8315t67, 2, 13542)"]`
 
-("Account1" is a placeholder for your entry representation.) And make sure to include "address, account nonce, balance" 3-tuple in the account information representation. This 3-tuple should be converted to a **single string**.
+<!-- ("Account1" is a placeholder for your entry representation.) And make sure to include "address, account nonce, balance" 3-tuple in the account information representation. This 3-tuple should be converted to a **single string**.  -->
+Each account information representation should include "address, account nonce, balance" 3-tuple.
 
-On how to parse the parameter `?block=10` you can refer to the code of parsing `lambda` for miner API. Please write this API and outputs the correct JSON format, since it is crucial for auto-grading. You can run your program by `cargo run` or directly run the binary in `target`. Then you can call http://127.0.0.1:7000/blockchain/state?block=10 or another number in your browser or use a command like `curl` to check if it works.
+Please refer to the code of parsing `lambda` for miner API, and use a similar logic to parse the parameter `?block=10`.  Please ensure this API outputs the correct JSON format, since it is crucial for auto-grading. You can run your program by `cargo run` or directly run the binary in `target`. Then you can call http://127.0.0.1:7000/blockchain/state?block=10 or another number in your browser or use a command like `curl` to check if it works.
 
 
 ## Conclusion
@@ -89,9 +93,9 @@ For mining, we will start 3 nodes' miner with `lambda=0`. You should choose a pr
 
 For transaction generator, we will start 3 nodes' transaction generator with `theta=100`. You need to write a transaction generator so that with this theta, it generates enough transactions to meet the following grading criteria.
 
-Let them run for 5 minutes. Then we will use API to check the states in them. We will use `/blockchain/state?block=0` (the state after ICO), `/blockchain/state?block=10` and `/blockchain/state?block=20`. The grading is related to the comparison between three nodes.
+Let them run for 5 minutes. Then we will use API to check the states in them. We will use `/blockchain/state?block=0` (the genesis state at ICO), `/blockchain/state?block=10` and `/blockchain/state?block=20`. The grading is related to the comparison between three nodes.
 
-1. The initial state after ICO should contain only 1 entry.
+1. The initial state after ICO should contain <=3 entries.
 2. The state at 10 and 20 should contain >=3 entries. (UTXO model: at least 3 UTXO entries; account-based model: at least 3 account informations.)
 3. State should evolve: states at 0, 10, and 20 should not be exactly the same.
 4. Common prefix: since it is already graded in the previous one, we relax the grading of this item. The state at block 10 should be the same across 3 nodes. Note that your chain should already be much longer than 10 blocks.
@@ -112,17 +116,15 @@ We do not provide any script for this assignment. You can double-check by follow
 ## FAQ
 
 - *How can one set up initial addresses for each node?* 
-     - TODO
+     - In the ICO, you can set addresses for each node according to deterministic keypairs using random seeds (eg: using `Ed25519KeyPair::from_seed_unchecked(&[random_seed;32]).unwrap()`)
 - *How can one pass the keypairs of addresses defined in the genesis to the transaction generators?* 
-     - TODO
-- *What do you mean by State of a block?* 
-     - TODO
-- *If the blockchains were in sync for the Part 7 but diverges in this part after the introduction of State, what might be the problem?* 
-    - TODO
+     - You could pass the respective initial keypairs to the transaction generators according to the `p2p_addr`.
+- *Is it an issue if the ordering of entries in the state api list is different across nodes?* 
+     - No, we will sort the entries beforee comparison during grading.
+- *If the blockchains were in sync for the Part 7 but diverge in this part after the introduction of State, what might be the problem?* 
+    - You can put print statements within the new code you added to see if a node is getting stuck somewhere (maybe waiting for a blockchain.lock() to be released). Make sure you are using `drop(mempool)` or `drop(blockchain)` if you are using a locked mempool or blockchain in your network worker, miner or transaction generator.
 - *How can one increase the number of valid transactions in a block?* 
-    - TODO
-- *Do I need to satisfy the grading requirements of Part7?*
-    - No.
+    - You can generate new addresses/accounts controlled by a node within the transaction generator (and create a transaction sending coins to this new account) 
 
 
 #### Note
